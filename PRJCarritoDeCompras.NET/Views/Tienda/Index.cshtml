@@ -1,0 +1,201 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_layouytienda.cshtml";
+}
+
+
+<div class="row mt-5">
+    <div class="bg-secondary py-3">
+        <div class="container my-3">
+            <div class="text-center text-white">
+                <h1 class="display-4 fw-bolder">Compra con estilo </h1>
+                <p class="lead fw-normal text-white-50 mb-0">With this shop hompeage template</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="py-2">
+        <div class="container px-2 px-lg-2 mt-5">
+            <div id="catalogo-productos" class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+
+            </div>
+        </div>
+    </div>
+
+</div>
+<section>
+
+    <div class="container-fluid px-5 my-5">
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="row-mb-3">
+                    <div class="col-sm-12">
+                        <div class="card">
+                            <div class="card-header bg-dark text-white">
+                                Categorias
+                            </div>
+                            <div id="contenedor_categoria" class="card-body">
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <br />
+                <div class="row-mb-3">
+                    <div class="col-sm-12">
+                        <div class="d-grid gap-2">
+                            <button id="btnaplicarfiltro" class="btn btn-outline-dark btn-block" type="button">
+                                <i class="fas fa-filter"></i>Aplicar Filtros
+                            </button>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+
+            <!--para las img de los productos-->
+            <div class="col-sm-9">
+
+                <div id="contenedor_producto" class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                   
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+</section>
+
+@section scripts{
+    <script>
+
+        $(document).ready(function () {
+            mostrarcategorias();
+            mostrarproductos(0);
+        })
+
+        function mostrarcategorias() {
+            jQuery.ajax({
+                url: "@Url.Action("listacategorias","Tienda")",
+                type: "GET",
+                dataType: "json",
+                contentType: "application/json;charset=utf-8",
+                success: function (response) {
+
+
+
+                    $("<div>").addClass("form-check").append(
+                        $("<input>").addClass("form-check-input").attr({ "type": "radio", "name": "categoria", "value": "0", "id": "cx", "checked": "checked" }),
+                        $("<label>").addClass("form-check-label").text("Todos").attr({ "for": "cx" })
+                    ).appendTo("#contenedor_categoria")
+
+                    $.each(response.data, function (i, element) {
+                        $("<div>").addClass("form-check").append(
+                            $("<input>").addClass("form-check-input").attr({ "type": "radio", "name": "categoria", "value": element.idcategoria, "id": "c"+i }),
+                            $("<label>").addClass("form-check-label").text(element.descripcion).attr({ "for": "c"+i })
+                        ).appendTo("#contenedor_categoria")
+                    })
+
+                }
+
+            })
+        }
+
+         function mostrarproductos(_idcategoria) {
+            jQuery.ajax({
+                url: "@Url.Action("listarproductos", "Tienda")",
+                type: "POST",
+                data: JSON.stringify({ idcategoria:_idcategoria}),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (response) {
+                    $("#contenedor_producto").html("");
+                    $.each(response.data, function (i, element) {
+
+                        $("<div>").addClass("col mb-5").append(
+                            $("<div>").addClass("card h-100").append(
+                                $("<img>").addClass("card-img-top").attr({ "src": "data:image/"+ element.extension + ";base64," + element.base64 }),
+                                $("<div>").addClass("card-body p-4").append(
+                                    $("<div>").addClass("text-center").append(
+                                        $("<h5>").addClass("fw - bolder").text(element.nombre),
+                                        "S/" + element.precio.toFixed(2)
+                                    ),
+
+                                    $("<div>").addClass("card-footer p-4 pt-0 border-top-0 bg-transparent").append(
+                                        @if (Session["Cliente"] != null)
+    {
+                                            @:$("<button>").addClass("btn btn-success mt-auto mb-2 agregarcarrito").data("idproducto", element.idproducto).text("Agregar a carrito"),
+    }
+                                        $("<a>").addClass("btn btn-dark mt-auto")
+                                            .attr({ "href": "@Url.Action("DetalleProducto","Tienda")" + "?idproducto=" + element.idproducto })
+                                            .text("Ver Detalle")
+                                    )
+                                )
+
+
+
+                            )
+                        ).appendTo("#contenedor_producto");
+                    })
+                },
+            })
+
+        }
+
+        $("#btnaplicarfiltro").click(function () {
+
+            var _idcategoria = $("input[name=categoria]:checked").val();
+
+            mostrarproductos(_idcategoria);
+        });
+
+
+        $(document).on("click", "button.agregarcarrito", function () {
+            console.log($(this).data("idproducto"))  
+
+            jQuery.ajax({
+                url: "@Url.Action("AgregarCarrito", "Tienda")",
+                type: "POST",
+                data: JSON.stringify({ idproducto:$(this).data("idproducto")}),
+                dataType: "json",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+
+                    if (data.respuesta) {
+                        mostrarcantidadcarrito();
+                        swal({
+                            title: "Agregado al Carrito",
+                            text: "¿Desea ir al carrito?",
+                            type: "success",
+                            showCancelButton: true,
+                            confirmButtonClass: "btn-primary",
+                            confirmButtonText: "Si",
+                            cancelButtonText: "No",
+                            closeOnConfirm: true
+                        }, function () {
+                            window.location.href = '@Url.Action("Carrito","Tienda")'
+                        })
+                    } else {
+                        swal("", data.mensaje, "warning");
+                        
+                    }
+
+                }
+            });
+        })
+
+
+    </script>
+    
+    
+    
+    
+    }
+
+
+

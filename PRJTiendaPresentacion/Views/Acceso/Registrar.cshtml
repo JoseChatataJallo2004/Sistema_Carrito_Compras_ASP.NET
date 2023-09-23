@@ -1,0 +1,110 @@
+﻿@model PRJTiendaPresentacion.Models.cliente 
+ @*esto de la linea 1 es para llamar a los atributos de lo que vamos agregar como m.nomres etc*@
+
+@{
+    Layout = null;
+}
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Registrar</title>
+    <link href="~/Content/Site.css" rel="stylesheet" />
+</head>
+<body class="bg-warning">
+    <div id="layoutAuthentication">
+        <div id="layoutAuthentication_content">
+            <main>
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-7">
+                            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                                <div class="card-header"><h3 class="text-center font-weight-light my-4">Crear una cuenta</h3></div>
+                                <div class="card-body">
+                                    <form action="@Url.Action("Registrar","Acceso")" method="post">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3 mb-md-0">
+                                                    @Html.TextBoxFor(m => m.nombres, new { @class = "form-control", @id = "txtnombre", @placeholder = ".", value = ViewData["nombres"] })
+                                                    @Html.Label("txtnombre", "Nombres")
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating">
+                                                    @Html.TextBoxFor(m => m.apellidos, new { @class = "form-control", @id = "txtapellido", @placeholder = ".", value = ViewData["apellidos"] })
+                                                    @Html.Label("txtapellido", "Apellidos")
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            @Html.TextBoxFor(m => m.correo, new { @class = "form-control", @id = "txtcorreo", @placeholder = ".", value = ViewData["correo"] })
+                                            @Html.Label("txtcorreo", "Correo")
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3 mb-md-0">
+                                                    @Html.TextBoxFor(m => m.clave, new { @class = "form-control", @id = "txtclave", @placeholder = "." })
+                                                    @Html.Label("txtclave", "Clave")
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating mb-3 mb-md-0">
+                                                    @Html.TextBoxFor(m => m.confirmarclave, new { @class = "form-control", @id = "txtconfirmarclave", @placeholder = "." })
+                                                    @Html.Label("txtconfirmarclave", "Confirma tu clave de nuevo")
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        @*esto es para que muestre la alerta cuando son incorrectas*@
+                                        @{
+                                            if (ViewBag.error != null)
+                                            {
+                                                <div class="row mb-3">
+                                                    <div class="alert alert-danger" role="alert">
+                                                        @ViewBag.error
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+
+
+
+                                        <div class="mt-4 mb-0">
+                                            <div class="d-grid"><button class="btn btn-primary btn-block" type="submit">Crear !!</button></div>
+                                        </div>
+                                    </form>
+                                </div>
+
+
+
+
+                                <div class="card-footer text-center py-3">
+                                    <div class="small"><a href="@Url.Action("Index","Acceso")">Ya tienes una cuenta? Iniciar Sesion</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <div id="layoutAuthentication_footer">
+            <footer class="py-4 bg-light mt-auto">
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
+                        <div>
+                            <a href="#">Privacy Policy</a>
+                            &middot;
+                            <a href="#">Terms &amp; Conditions</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+    </div>
+    <script src="~/Scripts/bootstrap.bundle.js"></script>
+</body>
+</html>
